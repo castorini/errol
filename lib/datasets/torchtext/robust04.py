@@ -8,7 +8,7 @@ from torchtext.data import Field, Example, Dataset
 from torchtext.data.iterator import BucketIterator
 from torchtext.vocab import Vectors
 
-from lib.util.preprocessing import text_tokenize, binary_one_hot
+from lib.utils.preprocessing import text_tokenize, binary_one_hot
 
 # Set upper limit on parsed CSV fields
 csv.field_size_limit(sys.maxsize)
@@ -33,7 +33,7 @@ class Robust04:
         self.fields = [('label', self.label_field), ('logit', self.logit_field), ('query_id', self.query_id_field),
                        ('doc_id', self.doc_id_field), ('query', self.query_field), ('text', self.text_field)]
 
-    def load_examples(self, dataset_path, dev_splits, test_splits):
+    def _load_examples(self, dataset_path, dev_splits, test_splits):
         with open(dataset_path, 'r') as dataset_tsv:
             for line in dataset_tsv:
                 data_row = line.split('\t')
@@ -56,7 +56,7 @@ class Robust04:
 
     def get_splits(self, dataset_dir, dev_splits, test_splits, vectors_name, vectors_cache, device, batch_size=64):
         dataset_path = os.path.join(dataset_dir, 'robust04', 'robust04.logits_bert_msmarco_mb.tsv')
-        self.load_examples(dataset_path, dev_splits, test_splits)
+        self._load_examples(dataset_path, dev_splits, test_splits)
 
         train_dataset = Dataset(self.train_examples, self.fields)
         train_dataset.sort_key = lambda example: len(example.text)
