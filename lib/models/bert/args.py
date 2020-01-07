@@ -7,8 +7,8 @@ def get_args():
     parser = models.args.get_args()
 
     parser.add_argument('--model', type=str, required=True)
-    parser.add_argument('--dataset', type=str, required=True, choices=['Microblog'])
-    parser.add_argument('--save-path', type=str, default=os.path.join('model_checkpoints', 'bert'))
+    parser.add_argument('--dataset', type=str, required=True, choices=['microblog'])
+    parser.add_argument('--save-path', type=str, default=os.path.join(os.pardir, 'model_checkpoints', 'bert'))
     parser.add_argument('--cache-dir', default='cache', type=str)
     parser.add_argument('--trained-model', default=None, type=str)
     parser.add_argument('--max-seq-length', default=128, type=int,

@@ -1,8 +1,8 @@
 import os
 
 # String templates for logging results
-LOG_HEADER = 'Split  Dev/Acc.  Dev/Pr.  Dev/Re.   Dev/F1   Dev/Loss'
-LOG_TEMPLATE = ' '.join('{:>5s},{:>9.4f},{:>8.4f},{:8.4f},{:8.4f},{:10.4f}'.split(','))
+LOG_HEADER = 'Split  Dev/P_30  Dev/MAP  Dev/MRR  Dev/Loss'
+LOG_TEMPLATE = ' '.join('{:>5s},{:>9.4f},{:>8.4f},{:8.4f},{:7.4f}'.split(','))
 
 # Path to pretrained model files
 MODEL_DATA_DIR = os.path.join(os.pardir, 'data', 'models')
@@ -23,4 +23,12 @@ PRETRAINED_VOCAB_ARCHIVE_MAP = {
     'bert-large-cased': os.path.join(MODEL_DATA_DIR, 'bert_pretrained', 'bert-large-cased-vocab.txt'),
     'bert-base-multilingual-uncased': os.path.join(MODEL_DATA_DIR, 'bert_pretrained', 'bert-base-multilingual-uncased-vocab.txt'),
     'bert-base-multilingual-cased': os.path.join(MODEL_DATA_DIR, 'bert_pretrained', 'bert-base-multilingual-cased-vocab.txt')
+}
+
+# Path to TREC eval binary
+TREC_EVAL_PATH = os.path.join(os.pardir, 'bin', 'trec_eval', 'trec_eval')
+
+# Path to qrel files
+QREL_PATH_MAP = {
+    'microblog': os.path.join(os.pardir, 'data', 'datasets', 'microblog', 'trec_mb_qrels.txt')
 }

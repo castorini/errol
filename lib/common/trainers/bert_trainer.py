@@ -24,8 +24,8 @@ class BertTrainer(Trainer):
         self.num_train_optimization_steps = int(len(self.examples) / args.batch_size /
                                                 args.gradient_accumulation_steps) * args.epochs
 
-        self.log_header = 'Epoch Iteration Progress   Dev/Acc.  Dev/Pr.  Dev/Re.   Dev/F1   Dev/Loss'
-        self.log_template = ' '.join('{:>5.0f},{:>9.0f},{:>6.0f}/{:<5.0f} {:>6.4f},{:>8.4f},{:8.4f},{:8.4f},{:10.4f}'.split(','))
+        self.log_header = 'Epoch Iteration Progress   Dev/P_30  Dev/MAP  Dev/MRR   Dev/Loss'
+        self.log_template = ' '.join('{:>5.0f},{:>9.0f},{:>6.0f}/{:<5.0f} {:>6.4f},{:>8.4f},{:8.4f},{:10.4f}'.split(','))
 
         self.iterations = 0
         self.best_dev_f1 = 0
@@ -66,20 +66,20 @@ class BertTrainer(Trainer):
         sampler = RandomSampler(dataset)
         dataloader = DataLoader(dataset, sampler=sampler, batch_size=self.args.batch_size)
 
-        for epoch in trange(int(self.args.epochs), desc="Epoch"):
+        for epoch in range(int(self.args.epochs)):
             self.train_epoch(dataloader)
             dev_scores = self.evaluator.evaluate()
 
             # Print validation results
             tqdm.write(self.log_header)
             tqdm.write(self.log_template.format(epoch + 1, self.iterations, epoch + 1, self.args.epochs,
-                                                dev_scores['accuracy'], dev_scores['precision'], dev_scores['recall'],
-                                                dev_scores['f1'], dev_scores['loss']))
+                                                dev_scores['p_30'], dev_scores['map'], dev_scores['recip_rank'],
+                                                dev_scores['loss']))
 
             # Update validation results
-            if dev_scores['f1'] > self.best_dev_f1:
+            if dev_scores['map'] > self.best_dev_f1:
                 self.unimproved_iters = 0
-                self.best_dev_f1 = dev_scores['f1']
+                self.best_dev_f1 = dev_scores['map']
                 torch.save(self.model, self.snapshot_path)
             else:
                 self.unimproved_iters += 1

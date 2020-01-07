@@ -15,8 +15,7 @@ def evaluate_split(model, examples, args, split):
     evaluator = BertEvaluator(model, examples, args)
     scores = evaluator.evaluate()
     print('\n' + LOG_HEADER)
-    print(LOG_TEMPLATE.format(split.upper(), scores['accuracy'], scores['precision'], scores['recall'],
-                              scores['f1'], scores['loss']))
+    print(LOG_TEMPLATE.format(split.upper(), scores['p_30'], scores['map'], scores['recip_rank'], scores['loss']))
 
 
 if __name__ == '__main__':
@@ -36,7 +35,7 @@ if __name__ == '__main__':
         torch.cuda.manual_seed_all(args.seed)
 
     dataset_map = {
-        'Microblog': Microblog
+        'microblog': Microblog
     }
 
     if args.gradient_accumulation_steps < 1:
@@ -52,7 +51,7 @@ if __name__ == '__main__':
     args.num_labels = dataset_map[args.dataset].NUM_CLASSES
 
     if not args.trained_model:
-        save_path = os.path.join(args.save_path, dataset_map[args.dataset].NAME)
+        save_path = os.path.join(args.save_path, args.dataset)
         os.makedirs(save_path, exist_ok=True)
 
     processor = dataset_map[args.dataset]()

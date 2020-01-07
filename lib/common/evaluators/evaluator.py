@@ -1,27 +1,35 @@
 import abc
-import warnings
+import datetime
+import os
+import shlex
+import subprocess
 
-import numpy as np
-from sklearn import metrics
+from common.constants import TREC_EVAL_PATH, QREL_PATH_MAP
+from utils.io import save_ranks
 
 
 class Evaluator(abc.ABC):
+    def __init__(self, model, args):
+        self.args = args
+        self.model = model
+
     @abc.abstractmethod
     def evaluate(self):
         raise NotImplementedError()
 
-    def calculate_scores(self, predicted_labels, target_labels, loss):
-        scores = dict()
-        predicted_labels = np.array(predicted_labels)
-        target_labels = np.array(target_labels)
+    def calculate_metrics(self, query_ids, doc_ids, scores):
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        output_path = os.path.join(self.args.save_path, self.args.dataset, '%s.txt' % timestamp)
+        save_ranks(output_path, query_ids, doc_ids, scores)
 
-        with warnings.catch_warnings():
-            # Suppress undefined metric warnings from sklearn.metrics
-            warnings.simplefilter("ignore")
-            scores['loss'] = loss
-            scores['accuracy'] = metrics.accuracy_score(target_labels, predicted_labels)
-            scores['precision'] = metrics.precision_score(target_labels, predicted_labels, average=None)[0]
-            scores['recall'] = metrics.recall_score(target_labels, predicted_labels, average=None)[0]
-            scores['f1'] = metrics.f1_score(target_labels, predicted_labels, average=None)[0]
+        cmd = '%s %s %s -m map -m P.30 -m recip_rank' % (TREC_EVAL_PATH, QREL_PATH_MAP[self.args.dataset], output_path)
+        pargs = shlex.split(cmd)
+        p = subprocess.Popen(pargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        pout, perr = p.communicate()
+        pout = [line.split() for line in pout.split(b'\n') if line.strip()]
 
-        return scores
+        metrics = dict()
+        for metric, _, value in pout:
+            metrics[metric.decode("utf-8").lower()] = float(value)
+
+        return metrics
