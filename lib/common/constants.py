@@ -3,6 +3,8 @@ import os
 # String templates for logging results
 LOG_HEADER = 'Split  Dev/P_30  Dev/MAP  Dev/MRR  Dev/Loss'
 LOG_TEMPLATE = ' '.join('{:>5s},{:>9.4f},{:>8.4f},{:8.4f},{:7.4f}'.split(','))
+DEV_LOG_HEADER = 'Epoch Iteration Progress   Dev/P_30  Dev/MAP  Dev/MRR   Dev/Loss'
+DEV_LOG_TEMPLATE = ' '.join('{:>5.0f},{:>9.0f},{:>6.0f}/{:<5.0f} {:>6.4f},{:>8.4f},{:8.4f},{:10.4f}'.split(','))
 
 # Path to pretrained model files
 MODEL_DATA_DIR = os.path.join(os.pardir, 'data', 'models')

@@ -59,6 +59,11 @@ if __name__ == '__main__':
     tokenizer = BertTokenizer.from_pretrained(pretrained_vocab_path)
     train_examples, dev_examples, test_examples = processor.get_splits(args.data_dir, tokenizer, args.max_seq_length)
 
+    print('Dataset:', args.dataset)
+    print('No. of train examples:', len(train_examples))
+    print('No. of dev examples:', len(dev_examples))
+    print('No. of test examples:', len(test_examples))
+
     pretrained_model_path = args.model if os.path.isfile(args.model) else PRETRAINED_MODEL_ARCHIVE_MAP[args.model]
     model = BertForSequenceClassification.from_pretrained(pretrained_model_path, num_labels=args.num_labels)
 
