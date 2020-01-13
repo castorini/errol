@@ -27,10 +27,17 @@ PRETRAINED_VOCAB_ARCHIVE_MAP = {
     'bert-base-multilingual-cased': os.path.join(MODEL_DATA_DIR, 'bert_pretrained', 'bert-base-multilingual-cased-vocab.txt')
 }
 
+# Path to word2vec embedding files
+WORD2VEC_EMBEDDING_FILE = 'GoogleNews-vectors-negative300.txt'
+WORD2VEC_EMBEDDING_DIR = os.path.join(MODEL_DATA_DIR, 'word2vec')
+
 # Path to TREC eval binary
 TREC_EVAL_PATH = os.path.join(os.pardir, 'bin', 'trec_eval', 'trec_eval')
 
-# Path to qrel files
+# Path to dataset directory
+DATASET_DIR = os.path.join(os.pardir, 'data', 'datasets')
+
+# Path to dataset qrel files
 QREL_PATH_MAP = {
-    'microblog': os.path.join(os.pardir, 'data', 'datasets', 'microblog', 'trec_mb_qrels.txt')
+    'microblog': os.path.join(DATASET_DIR, 'microblog', 'trec_mb_qrels.txt')
 }

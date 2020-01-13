@@ -3,6 +3,7 @@ import torchtext
 from torchtext.data import Field, BucketIterator
 from torchtext.vocab import Vectors
 
+from common.constants import WORD2VEC_EMBEDDING_FILE, WORD2VEC_EMBEDDING_DIR
 from datasets.dataset import Dataset
 from utils.preprocessing import text_tokenize
 
@@ -23,19 +24,19 @@ class TorchtextDataset(Dataset):
         self.fields = [('label', self.label_field), ('logit', self.logit_field), ('query_id', self.query_id_field),
                        ('doc_id', self.doc_id_field), ('query', self.query_field), ('input', self.input_field)]
 
-    def get_splits(self, vectors_name, vectors_cache, device, batch_size):
+    def get_splits(self, device, batch_size):
         train_dataset = torchtext.data.Dataset(self.train_examples, self.fields)
-        train_dataset.sort_key = lambda example: len(example.text)
+        train_dataset.sort_key = lambda example: len(example.input)
 
         dev_dataset = torchtext.data.Dataset(self.dev_examples, self.fields)
-        dev_dataset.sort_key = lambda example: len(example.text)
+        dev_dataset.sort_key = lambda example: len(example.input)
 
         test_dataset = torchtext.data.Dataset(self.test_examples, self.fields)
-        test_dataset.sort_key = lambda example: len(example.text)
+        test_dataset.sort_key = lambda example: len(example.input)
 
-        vectors = Vectors(name=vectors_name, cache=vectors_cache, unk_init=torch.Tensor.zero_)
-        self.query_field.build_vocab(train_dataset, dev_dataset, test_dataset, vectors=vectors)
+        vectors = Vectors(name=WORD2VEC_EMBEDDING_FILE, cache=WORD2VEC_EMBEDDING_DIR, unk_init=torch.Tensor.zero_)
         self.input_field.build_vocab(train_dataset, dev_dataset, test_dataset, vectors=vectors)
+        self.query_field.vocab = self.input_field.vocab
 
         return BucketIterator.splits((train_dataset, dev_dataset, test_dataset), batch_size=batch_size,
                                      repeat=False, shuffle=True, sort_within_batch=True, device=device)

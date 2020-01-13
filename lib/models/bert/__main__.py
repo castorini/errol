@@ -57,7 +57,7 @@ if __name__ == '__main__':
     processor = dataset_map[args.dataset]()
     pretrained_vocab_path = PRETRAINED_VOCAB_ARCHIVE_MAP[args.model]
     tokenizer = BertTokenizer.from_pretrained(pretrained_vocab_path)
-    train_examples, dev_examples, test_examples = processor.get_splits(args.data_dir, tokenizer, args.max_seq_length)
+    train_examples, dev_examples, test_examples = processor.get_splits(tokenizer, args.max_seq_length)
 
     print('Dataset:', args.dataset)
     print('No. of train examples:', len(train_examples))

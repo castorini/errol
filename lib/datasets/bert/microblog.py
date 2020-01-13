@@ -1,6 +1,7 @@
 import os
 import random
 
+from common.constants import DATASET_DIR
 from datasets.dataset import Dataset
 from datasets.bert.common import Example
 from utils.preprocessing import binary_one_hot
@@ -15,13 +16,13 @@ class Microblog(Dataset):
         self.dev_examples = list()
         self.test_examples = list()
 
-    def _load_examples(self, dataset_dir, tokenizer, max_seq_length, test_split):
+    def _load_examples(self, tokenizer, max_seq_length, test_split):
         query_ids = set()
         train_dev_examples = list()
         dataset_files = ['trec_mb_2011.tsv', 'trec_mb_2012.tsv', 'trec_mb_2013.tsv', 'trec_mb_2014.tsv']
 
         for filename in dataset_files:
-            with open(os.path.join(dataset_dir, 'microblog', filename), 'r') as tsv_file:
+            with open(os.path.join(DATASET_DIR, 'microblog', filename), 'r') as tsv_file:
                 for line in tsv_file:
                     data_row = line.split('\t')
                     label = binary_one_hot(data_row[0])
@@ -49,6 +50,6 @@ class Microblog(Dataset):
             else:
                 self.train_examples.append(example)
 
-    def get_splits(self, dataset_dir, tokenizer, max_seq_length, test_split='2014'):
-        self._load_examples(dataset_dir, tokenizer, max_seq_length, test_split)
+    def get_splits(self, tokenizer, max_seq_length, test_split='2014'):
+        self._load_examples(tokenizer, max_seq_length, test_split)
         return self.train_examples, self.dev_examples, self.test_examples

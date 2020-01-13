@@ -12,7 +12,5 @@ def get_args():
     parser.add_argument('--lr', type=float, default=0.001)
     parser.add_argument('--seed', type=int, default=3435)
     parser.add_argument('--patience', type=int, default=5)
-    parser.add_argument('--log-every', type=int, default=10)
-    parser.add_argument('--data-dir', default=os.path.join(os.pardir, 'data', 'datasets'))
 
     return parser

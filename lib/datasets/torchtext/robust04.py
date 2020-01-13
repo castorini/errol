@@ -5,8 +5,9 @@ import sys
 
 from torchtext.data import Example
 
+from common.constants import DATASET_DIR
 from datasets.torchtext.common import TorchtextDataset
-from lib.utils.preprocessing import binary_one_hot
+from utils.preprocessing import binary_one_hot
 
 # Set upper limit on parsed CSV fields
 csv.field_size_limit(sys.maxsize)
@@ -16,12 +17,12 @@ class Robust04(TorchtextDataset):
     NAME = 'Robust04'
     NUM_CLASSES = 2
 
-    def __init__(self, dataset_dir, dev_splits, test_splits):
+    def __init__(self, dev_splits, test_splits):
         super().__init__()
-        dataset_path = os.path.join(dataset_dir, 'robust04', 'robust04.logits_bert_msmarco_mb.tsv')
-        self._load_examples(dataset_path, dev_splits, test_splits)
+        self._load_examples(dev_splits, test_splits)
 
-    def _load_examples(self, dataset_path, dev_splits, test_splits):
+    def _load_examples(self, dev_splits, test_splits):
+        dataset_path = os.path.join(DATASET_DIR, 'robust04', 'robust04.logits_bert_msmarco_mb.tsv')
         with open(dataset_path, 'r') as dataset_tsv:
             for line in dataset_tsv:
                 data_row = line.split('\t')
