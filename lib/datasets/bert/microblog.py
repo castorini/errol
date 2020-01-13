@@ -1,7 +1,8 @@
 import os
 import random
 
-from datasets.common import Dataset, Example
+from datasets.dataset import Dataset
+from datasets.bert.common import Example
 from utils.preprocessing import binary_one_hot
 
 
