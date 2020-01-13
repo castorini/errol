@@ -5,31 +5,30 @@ import torch.nn.functional as F
 
 
 class KimCNNEncoder(nn.Module):
-    def __init__(self, config):
+    def __init__(self, args):
         super().__init__()
-        self.num_conv = 3
-        self.config = config
+        self.args = args
 
-        dataset = config.dataset
-        words_num = config.words_num
-        words_dim = config.words_dim
-        target_class = config.target_class
-        output_channel = config.output_channel
+        dataset = args.dataset
+        words_num = args.words_num
+        words_dim = args.words_dim
+        target_class = args.target_class
+        output_channel = args.output_channel
 
-        if config.mode == 'rand':
+        if args.mode == 'rand':
             input_channel = 1
             rand_embed_init = torch.Tensor(words_num, words_dim).uniform_(-0.25, 0.25)
             self.embed = nn.Embedding.from_pretrained(rand_embed_init, freeze=False)
-        elif config.mode == 'static':
+        elif args.mode == 'static':
             input_channel = 1
-            self.static_embed = nn.Embedding.from_pretrained(dataset.TEXT_FIELD.vocab.vectors, freeze=True)
-        elif config.mode == 'non-static':
+            self.static_embed = nn.Embedding.from_pretrained(dataset.fields['input'].vocab.vectors, freeze=True)
+        elif args.mode == 'non-static':
             input_channel = 1
-            self.non_static_embed = nn.Embedding.from_pretrained(dataset.TEXT_FIELD.vocab.vectors, freeze=False)
-        elif config.mode == 'multichannel':
+            self.non_static_embed = nn.Embedding.from_pretrained(dataset.fields['input'].vocab.vectors, freeze=False)
+        elif args.mode == 'multichannel':
             input_channel = 2
-            self.static_embed = nn.Embedding.from_pretrained(dataset.TEXT_FIELD.vocab.vectors, freeze=True)
-            self.non_static_embed = nn.Embedding.from_pretrained(dataset.TEXT_FIELD.vocab.vectors, freeze=False)
+            self.static_embed = nn.Embedding.from_pretrained(dataset.fields['input'].vocab.vectors, freeze=True)
+            self.non_static_embed = nn.Embedding.from_pretrained(dataset.fields['input'].vocab.vectors, freeze=False)
         else:
             raise ValueError("Unsupported embedding mode")
 
@@ -37,20 +36,20 @@ class KimCNNEncoder(nn.Module):
         self.conv2 = nn.Conv2d(input_channel, output_channel, (4, words_dim), padding=(3,0))
         self.conv3 = nn.Conv2d(input_channel, output_channel, (5, words_dim), padding=(4,0))
 
-        self.dropout = nn.Dropout(config.dropout)
-        self.fc1 = nn.Linear(self.num_conv * output_channel, target_class)
+        self.dropout = nn.Dropout(args.dropout)
+        self.fc1 = nn.Linear(3 * output_channel, target_class)
 
-    def forward(self, x, **kwargs):
-        if self.config.mode == 'rand':
+    def forward(self, x):
+        if self.args.mode == 'rand':
             word_input = self.embed(x)  # (batch, sent_len, embed_dim)
             x = word_input.unsqueeze(1)  # (batch, channel_input, sent_len, embed_dim)
-        elif self.config.mode == 'static':
+        elif self.args.mode == 'static':
             static_input = self.static_embed(x)
             x = static_input.unsqueeze(1)  # (batch, channel_input, sent_len, embed_dim)
-        elif self.config.mode == 'non-static':
+        elif self.args.mode == 'non-static':
             non_static_input = self.non_static_embed(x)
             x = non_static_input.unsqueeze(1)  # (batch, channel_input, sent_len, embed_dim)
-        elif self.config.mode == 'multichannel':
+        elif self.args.mode == 'multichannel':
             non_static_input = self.non_static_embed(x)
             static_input = self.static_embed(x)
             x = torch.stack([non_static_input, static_input], dim=1)  # (batch, channel_input=2, sent_len, embed_dim)
