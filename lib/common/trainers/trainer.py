@@ -40,7 +40,7 @@ class Trainer(abc.ABC):
             if dev_scores['map'] > self.best_dev_map:
                 self.unimproved_iterations = 0
                 self.best_dev_map = dev_scores['map']
-                torch.save(self.model, self.snapshot_path)
+                torch.save(self.model.state_dict(), self.snapshot_path)
             else:
                 self.unimproved_iterations += 1
                 if self.unimproved_iterations >= self.args.patience:
