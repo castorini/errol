@@ -37,7 +37,7 @@ class BertEvaluator(Evaluator):
             with torch.no_grad():
                 logits = self.model(input_ids=input_ids, token_type_ids=token_type_ids, attention_mask=attention_mask)[0]
 
-            predicted_scores.extend(torch.argmax(logits, dim=1).cpu().detach().numpy())
+            predicted_scores.extend(logits.cpu().detach().numpy()[:, 0])
             loss = F.cross_entropy(logits, torch.argmax(label_ids, dim=1))
 
             if self.args.n_gpu > 1:
