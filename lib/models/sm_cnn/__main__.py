@@ -73,10 +73,10 @@ if __name__ == '__main__':
 
     if not args.trained_model:
         trainer.train()
+        model.load_state_dict(torch.load(trainer.snapshot_path))
     else:
         model = torch.load(args.trained_model, map_location=lambda storage, location: storage.to(args.device))
 
     # Calculate dev and test metrics
-    model.load_state_dict(torch.load(trainer.snapshot_path))
     evaluate_dataset(model, dev_iter, dataset.doc_id_map, 'dev')
     evaluate_dataset(model, test_iter, dataset.doc_id_map, 'test')

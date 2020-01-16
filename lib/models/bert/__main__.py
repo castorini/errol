@@ -88,8 +88,7 @@ if __name__ == '__main__':
 
     if not args.trained_model:
         trainer.train()
-        model = torch.load(trainer.snapshot_path)
-
+        model.load_state_dict(torch.load(trainer.snapshot_path))
     else:
         model = BertForSequenceClassification.from_pretrained(pretrained_model_path, num_labels=args.num_labels)
         model_ = torch.load(args.trained_model, map_location=lambda storage, loc: storage)
@@ -100,5 +99,6 @@ if __name__ == '__main__':
         model.load_state_dict(state)
         model = model.to(device)
 
+    # Calculate dev and test metrics
     evaluate_split(model, dev_examples, args, split='dev')
     evaluate_split(model, test_examples, args, split='test')
