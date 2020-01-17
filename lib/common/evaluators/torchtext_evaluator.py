@@ -31,7 +31,7 @@ class TorchtextEvaluator(Evaluator):
                 logits = self.model(batch.query[0], batch.input[0], lengths=(batch.query[1], batch.input[1]))
 
             doc_ids.extend((self.doc_id_map[x.item()] for x in batch.doc_id))
-            query_ids.extend(batch.query_id)
+            query_ids.extend(batch.query_id.cpu().detach().numpy())
             predicted_scores.extend(logits.cpu().detach().numpy()[:, 0])
             loss = F.cross_entropy(logits, torch.argmax(batch.label, dim=1))
 

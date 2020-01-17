@@ -9,6 +9,7 @@ from common.constants import LOG_HEADER, LOG_TEMPLATE
 from common.evaluators import TorchtextEvaluator
 from common.trainers import TorchtextTrainer
 from datasets.torchtext import Microblog
+from datasets.torchtext.msmarco import MSMarco
 from models.sm_cnn.args import get_args
 from models.sm_cnn.model import SiameseCNN
 
@@ -37,6 +38,7 @@ if __name__ == '__main__':
         torch.cuda.manual_seed_all(args.seed)
 
     dataset_map = {
+        'msmarco': MSMarco,
         'microblog': Microblog
     }
 
