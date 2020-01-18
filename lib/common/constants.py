@@ -39,5 +39,6 @@ DATASET_DIR = os.path.join(os.pardir, 'data', 'datasets')
 
 # Path to dataset qrel files
 QREL_PATH_MAP = {
-    'microblog': os.path.join(DATASET_DIR, 'microblog', 'trec_mb_qrels.txt')
+    'microblog': os.path.join(DATASET_DIR, 'microblog', 'trec_mb_qrels.txt'),
+    'msmarco': os.path.join(DATASET_DIR, 'msmarco', 'msmarco.dev.qrels.small.tsv')
 }
