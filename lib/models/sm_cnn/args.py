@@ -17,6 +17,10 @@ def get_args():
     parser.add_argument('--save-path', type=str, default=os.path.join(os.pardir, 'model_checkpoints', 'sm_cnn'))
     parser.add_argument('--trained-model', type=str)
 
+    parser.add_argument('--distill', action='store_true')
+    parser.add_argument('--distill-div', type=float, default=1)
+    parser.add_argument('--distill-mult', type=float, default=4)
+
     args = parser.parse_args()
     return args
 

@@ -24,10 +24,13 @@ class TorchtextTrainer(Trainer):
 
             loss = F.cross_entropy(logits, torch.argmax(batch.label.data, dim=1))
 
+            if self.args.distill:
+                loss += self.args.distill_mult * F.kl_div(F.log_softmax(logits), F.softmax(batch.logits / self.args.distill_div))
+
             if hasattr(self.model, 'tar') and self.model.tar:
-                loss = loss + self.model.tar * (rnn_outs[1:] - rnn_outs[:-1]).pow(2).mean()
+                loss += self.model.tar * (rnn_outs[1:] - rnn_outs[:-1]).pow(2).mean()
             if hasattr(self.model, 'ar') and self.model.ar:
-                loss = loss + self.model.ar * (rnn_outs[:]).pow(2).mean()
+                loss += self.model.ar * (rnn_outs[:]).pow(2).mean()
 
             loss.backward()
             self.optimizer.step()
