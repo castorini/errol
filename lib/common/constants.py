@@ -3,6 +3,8 @@ import os
 # String templates for logging results
 LOG_HEADER = 'Split  Dev/P_30  Dev/MAP  Dev/MRR  Dev/Loss'
 LOG_TEMPLATE = ' '.join('{:>5s},{:>9.4f},{:>8.4f},{:8.4f},{:7.4f}'.split(','))
+RERANK_LOG_HEADER = 'Split  Alpha  Dev/P_30  Dev/MAP  Dev/MRR'
+RERANK_LOG_TEMPLATE = ' '.join('{:>5s},{:>6.2f},{:>9.4f},{:>8.4f},{:8.4f}'.split(','))
 DEV_LOG_HEADER = 'Epoch Iteration Progress   Dev/P_30  Dev/MAP  Dev/MRR   Dev/Loss'
 DEV_LOG_TEMPLATE = ' '.join('{:>5.0f},{:>9.0f},{:>6.0f}/{:<5.0f} {:>6.4f},{:>8.4f},{:8.4f},{:10.4f}'.split(','))
 
@@ -41,4 +43,9 @@ DATASET_DIR = os.path.join(os.pardir, 'data', 'datasets')
 QREL_PATH_MAP = {
     'microblog': os.path.join(DATASET_DIR, 'microblog', 'trec_mb_qrels.txt'),
     'msmarco': os.path.join(DATASET_DIR, 'msmarco', 'msmarco.dev.qrels.small.tsv')
+}
+
+# Path to retrieval baseline ranks
+RETRIEVAL_PATH_MAP = {
+    'microblog': os.path.join(DATASET_DIR, 'microblog', 'trec_mb_run_ql.txt')
 }

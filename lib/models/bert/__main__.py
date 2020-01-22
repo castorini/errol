@@ -9,6 +9,7 @@ from common.evaluators import BertEvaluator
 from common.trainers import BertTrainer
 from datasets.bert import Microblog
 from models.bert.args import get_args
+from utils.rerank import rerank
 
 
 def evaluate_split(model, examples, args, split):
@@ -16,6 +17,7 @@ def evaluate_split(model, examples, args, split):
     scores = evaluator.evaluate()
     print('\n' + LOG_HEADER)
     print(LOG_TEMPLATE.format(split.upper(), scores['p_30'], scores['map'], scores['recip_rank'], scores['loss']))
+    return evaluator.output_path
 
 
 if __name__ == '__main__':
@@ -83,8 +85,8 @@ if __name__ == '__main__':
     scheduler = get_linear_schedule_with_warmup(optimizer, num_training_steps=num_train_opt_steps,
                                                 num_warmup_steps=args.warmup_proportion * num_train_opt_steps)
 
-    dev_evaluator = BertEvaluator(model, dev_examples, args)
-    trainer = BertTrainer(model, train_examples, optimizer, scheduler, dev_evaluator, args)
+    evaluator = BertEvaluator(model, dev_examples, args)
+    trainer = BertTrainer(model, train_examples, optimizer, scheduler, evaluator, args)
 
     if not args.trained_model:
         trainer.train()
@@ -100,5 +102,6 @@ if __name__ == '__main__':
         model = model.to(device)
 
     # Calculate dev and test metrics
-    evaluate_split(model, dev_examples, args, split='dev')
-    evaluate_split(model, test_examples, args, split='test')
+    dev_ranks_path = evaluate_split(model, dev_examples, args, split='dev')
+    test_ranks_path = evaluate_split(model, test_examples, args, split='test')
+    rerank(QREL_PATH_MAP[args.dataset], RETRIEVAL_PATH_MAP[args.dataset], dev_ranks_path, test_ranks_path)
