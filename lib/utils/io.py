@@ -1,6 +1,10 @@
+import shlex
+import subprocess
 from collections import defaultdict
 
 from tqdm import tqdm
+
+from common.constants import TREC_EVAL_PATH
 
 
 def save_ranks(output_path, query_ids, doc_ids, scores):
@@ -24,3 +28,17 @@ def save_ranks(output_path, query_ids, doc_ids, scores):
             for score, doc_ids in sorted_score:
                 output_file.write(f'{query_id} Q0 {doc_ids} {rank} {score} Errol\n')
                 rank += 1
+
+
+def run_trec_eval(qrels_path, ranks_path):
+    cmd = '%s %s %s -m map -m P.30 -m recip_rank' % (TREC_EVAL_PATH, qrels_path, ranks_path)
+    pargs = shlex.split(cmd)
+    p = subprocess.Popen(pargs, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    pout, perr = p.communicate()
+    pout = [line.split() for line in pout.split(b'\n') if line.strip()]
+
+    metrics = dict()
+    for metric, _, value in pout:
+        metrics[metric.decode("utf-8").lower()] = float(value)
+
+    return metrics
