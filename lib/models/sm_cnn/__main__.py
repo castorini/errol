@@ -5,20 +5,22 @@ from copy import deepcopy
 import numpy as np
 import torch
 
-from common.constants import LOG_HEADER, LOG_TEMPLATE
+from common.constants import LOG_HEADER, LOG_TEMPLATE, RETRIEVAL_PATH_MAP, QREL_PATH_MAP
 from common.evaluators import TorchtextEvaluator
 from common.trainers import TorchtextTrainer
 from datasets.torchtext import Microblog
 from datasets.torchtext.msmarco import MSMarco
 from models.sm_cnn.args import get_args
 from models.sm_cnn.model import SiameseCNN
+from utils.rerank import rerank
 
 
-def evaluate_dataset(model, dataloader, doc_id_map, split):
-    split_evaluator = TorchtextEvaluator(model, dataloader, doc_id_map, args)
-    scores = split_evaluator.evaluate()
+def evaluate_split(model, dataloader, doc_id_map, split):
+    evaluator = TorchtextEvaluator(model, dataloader, doc_id_map, args)
+    scores = evaluator.evaluate()
     print('\n' + LOG_HEADER)
     print(LOG_TEMPLATE.format(split.upper(), scores['p_30'], scores['map'], scores['recip_rank'], scores['loss']))
+    return evaluator.output_path
 
 
 if __name__ == '__main__':
@@ -80,5 +82,6 @@ if __name__ == '__main__':
         model = torch.load(args.trained_model, map_location=lambda storage, location: storage.to(args.device))
 
     # Calculate dev and test metrics
-    evaluate_dataset(model, dev_iter, dataset.doc_id_map, 'dev')
-    evaluate_dataset(model, test_iter, dataset.doc_id_map, 'test')
+    dev_ranks_path = evaluate_split(model, dev_iter, dataset.doc_id_map, 'dev')
+    test_ranks_path = evaluate_split(model, test_iter, dataset.doc_id_map, 'test')
+    rerank(QREL_PATH_MAP[args.dataset], RETRIEVAL_PATH_MAP[args.dataset], dev_ranks_path, test_ranks_path)
