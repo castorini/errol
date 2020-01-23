@@ -36,7 +36,7 @@ class TorchtextDataset(Dataset):
 
         vectors = Vectors(name=WORD2VEC_EMBEDDING_FILE, cache=WORD2VEC_EMBEDDING_DIR, unk_init=torch.Tensor.zero_)
         self.input_field.build_vocab(train_dataset, dev_dataset, test_dataset, vectors=vectors)
-        self.query_field.vocab = self.input_field.vocab
+        self.query_field.build_vocab(train_dataset, dev_dataset, test_dataset, vectors=vectors)
 
         return BucketIterator.splits((train_dataset, dev_dataset, test_dataset), batch_size=batch_size,
                                      repeat=False, shuffle=True, sort_within_batch=True, device=device)
