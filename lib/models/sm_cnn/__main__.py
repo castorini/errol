@@ -53,7 +53,8 @@ if __name__ == '__main__':
     config = deepcopy(args)
     config.dataset = train_iter.dataset
     config.target_class = dataset.NUM_CLASSES
-    config.words_num = len(train_iter.dataset.fields['input'].vocab)
+    config.input_vocab_len = len(train_iter.dataset.fields['input'].vocab)
+    config.query_vocab_len = len(train_iter.dataset.fields['query'].vocab)
 
     print('Dataset:', args.dataset)
     print('No. of train examples:', len(train_iter.dataset))
