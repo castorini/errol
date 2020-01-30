@@ -34,7 +34,7 @@ class MSMarco(TorchtextDataset):
         label, logits, query_id, doc_id = line.strip().split('\t')
         data_row = list()
         data_row.append(binary_one_hot(label))
-        data_row.append(ast.literal_eval(logits))
+        data_row.append(ast.literal_eval(logits)[::-1])
         data_row.append(int(query_id))
 
         doc_id_index = len(self.doc_id_map)  # Convert the document id to an integer
